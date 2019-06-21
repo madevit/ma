@@ -14,7 +14,7 @@ class InstallSchema implements InstallSchemaInterface
     {
         $installer = $setup;
         $installer->startSetup();
-        if (version_compare($context->getVersion(), '1.0.0') < 0) {
+        if (version_compare($context->getVersion(), '1.0.1') < 0) {
             $installer->getConnection()
                 ->addColumn(
                     $installer->getTable('sales_order'), 'ma_tracking',
