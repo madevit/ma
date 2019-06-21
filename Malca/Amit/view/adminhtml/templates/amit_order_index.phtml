@@ -1,0 +1,947 @@
+<?php
+$totalPages = $block->getCustomVariable('totalPage');
+$salesCollection = $this->getCustomVariable('order_arr');
+$orderStatuses = array();
+$dowAct = $this->getUrl('amit/orderajax');
+$key = $this->getFormKey();
+$appLogo = $this->getViewFileUrl('Malca_Amit/images/App_Logo.jpg');
+$logo = $this->getViewFileUrl('Malca_Amit/images/logo.png');
+?>
+
+<form name="downloadLbl" method="POST" style="display: none;" action="<?php echo $this->escapeHtml($dowAct);?>">
+    <input type="hidden" name="form_key" value="<?php echo $this->escapeHtml($key);?>">
+    <input type="hidden" name="dLable" value="True">
+    <input type="submit" name="submitDown" value="">
+</form>
+<div class="ma_se-pre-con" style="display: none;">
+    <img src="<?php echo $this->escapeHtml($this->getViewFileUrl('Malca_Amit/images/ma_loader.gif')); ?>">
+</div>
+<div class="ma-alert ma-alert-error" style="display: none;"><span>X</span></div>
+<div class="ma-alert ma-alert-success" style="display: none;"><span>X</span></div>
+<div class="ma_body ma_order_list">
+    <div class="ma_popup" id="estcost">
+        <div class="popup_content">
+            <div class="ma_header">
+                <h3></h3>
+                <a href="javascript:void(0);" class="close">X</a>
+            </div>
+            <div class="ma_content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Charges</th>
+                        </tr>
+                    </thead>
+                    <tbody class="ma_charges"></tbody>
+                    <tfoot>
+                        <tr>
+                            <td>TOTAL ESTIMATED COST</td>
+                            <td class="total"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="ma_footer">
+                <button type="button" class="PrintLable" style="margin-right: 15px;">Print Label</button>
+                <button class="close">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <header>
+        <div class="left">
+            <img src="<?php echo $this->escapeHtml($appLogo); ?>">
+        </div>
+        <div class="right">
+            <img src="<?php echo $this->escapeHtml($logo); ?>">
+        </div>
+    </header>
+    <div class="ma_order">
+        <div class="ma_order_tbl">
+            <div class="ma_listing">
+                <input type="button" class="refreshBtn" value="Refresh">
+                <input type="button" value="Print Multiple Labels" class="PrintLable">
+                <div class="filter-strip">
+                    <div class="filter">
+                            <select class="selFilter">
+                                <option value="">Filter</option>
+                                <!-- <option value="order">Order Status</option> -->
+                                <option value="fulfillment" selected="">Fulfillment Status</option>
+                                <option value="date">Date</option>
+                            </select>
+                    </div>
+                    <div class="f-search">
+                        <span class="search-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 56.966 56.966" style="enable-background:new 0 0 56.966 56.966;" xml:space="preserve" width="12px" height="12px">
+                            <path d="M55.146,51.887L41.588,37.786c3.486-4.144,5.396-9.358,5.396-14.786c0-12.682-10.318-23-23-23s-23,10.318-23,23  s10.318,23,23,23c4.761,0,9.298-1.436,13.177-4.162l13.661,14.208c0.571,0.593,1.339,0.92,2.162,0.92  c0.779,0,1.518-0.297,2.079-0.837C56.255,54.982,56.293,53.08,55.146,51.887z M23.984,6c9.374,0,17,7.626,17,17s-7.626,17-17,17  s-17-7.626-17-17S14.61,6,23.984,6z" fill="#abb9c7"/>
+                            </svg>
+
+                        </span>
+                        <select class="ma_sub_filter sel_" style="display: none;">
+                            <option value="">Search Order</option>
+                        </select>
+                        <!-- <select class="sel_order ma_sub_filter" style="display: none;">
+                            <option value="">Select value</option>
+                            <?php
+                                //foreach ($orderStatuses as $status) { ?>
+                                    <option value='<?php //echo $this->escapeHtml($status['status']);?>'>
+                                        <?php //echo $this->escapeHtml($status['label']);?>
+                                    </option>
+                            <?php
+                                //}
+                            ?>
+                        </select> -->
+                        <select class="sel_fulfillment ma_sub_filter">
+                            <option value="">Select value</option>
+                            <option value="fulfilled">Fulfilled</option>
+                            <option value="unfulfilled" selected="">Unfulfilled</option>
+                        </select>
+                        <select class="sel_date ma_sub_filter" style="display: none;">
+                            <option value="">Select a value</option>
+                            <option value="today">Today</option>
+                            <option value="this_week">This week</option>
+                            <option value="this_month">This month</option>
+                            <option value="less_than">On or before</option>
+                            <option value="greater_than">On or after</option>
+                        </select>
+                        <input type="text" name="date" id="datepicker">
+                    </div>
+                </div>
+            </div>
+            <table class="" id="Allorder" style="background:#fff;font-size:14px;font-weight: normal;">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" name="checkAll"></th>
+                        <th>Order</th>
+                        <th>
+                            <div order="asc" class="order_by">Date <span class="ma_sort"></span></div>
+                        </th>
+                        <th>Customer</th>
+                        <th>Tracking Number</th>
+                        <th>Payment Status</th>
+                        <th>Fulfillment Status</th>
+                        <th>Total</th>
+                        <th colspan="3" style="text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="orderBody">
+                    <?php foreach ($salesCollection as $order) { 
+                        $orUrl=$this->getBaseUrl()."admin/sales/order/view/order_id/".$order['entity_id'];
+                        // $curr = Mage::helper("amit")->getCurrencySymbol($order['order_currency_code']);
+                        $curr = $block->getCurrencySymbol($order['order_currency_code']);
+                        
+                        $oid=$order['entity_id'];
+                        $date = date('M d Y', strtotime($order['created_at']));
+                        $cust = $order['customer_firstname']." ".$order['customer_lastname'];
+                    ?>  
+                        <tr id='<?php echo $this->escapeHtml($order['increment_id']);?>' class="<?php echo $cls = (isset($order['international'])?'ma-intr':'') ?>">
+                            <td>
+                                <input type="checkbox" name="prntLbl" value="<?php echo $this->escapeHtml($oid);?>">
+                            </td>
+                            <td>
+                                <a href="<?php echo $this->escapeHtml($orUrl);?>" target="_blank">
+                                    <?php echo $this->escapeHtml($order['increment_id']); ?>
+                                </a>
+                            </td>
+                            <td><?php echo $this->escapeHtml($date); ?></td>
+                            <td><?php echo $this->escapeHtml($cust); ?></td>
+                            <td class="trackNumber"> 
+                                <?php if ($order['ma_tracking'] !='') {
+                                        if (strtolower($order['ma_couriertype']) == 'fedex') { ?>
+                                            <a target='_blank' href='http://www.fedex.com/Tracking?action=track&tracknumbers=<?php echo $this->escapeHtml($order['ma_tracking']);?>'>
+                                                <?php echo $this->escapeHtml($order['ma_tracking']);?>
+                                            </a>;
+                                        <?php } else if (strtolower($order['ma_couriertype']) == 'ups') { ?>
+                                            <a target='_blank' href='http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=<?php  echo $this->escapeHtml($order['ma_tracking']);?>'>
+                                                <?php echo $this->escapeHtml($order['ma_tracking']);?>
+                                            </a>;
+                                        <?php } else if (strtolower($order['ma_couriertype']) == 'usps') { ?>
+                                            <a target='_blank' href='https://tools.usps.com/go/TrackConfirmAction_input?qtc_tLabels1=<?php echo $this->escapeHtml($order['ma_tracking']);?>'>
+                                                <?php echo $this->escapeHtml($order['ma_tracking']);?>
+                                            </a>;
+                                        <?php }
+                                } ?>
+                            </td>
+                            <td>
+                                <?php
+                                    $amt = (int)$order['base_grand_total'] - (int)$order['total_paid'];
+                                    if ($amt == 0) { ?>
+                                        <span class="bck-gray">Paid</span>
+                                    <?php } else if ($amt == (int)$order['base_grand_total']) { ?>
+                                        <span class="bck-orange">Pending</span>
+                                    <?php } else if ($amt != 0 && $amt < (int)$order['base_grand_total']) { ?>
+                                        <span class="bck-gray">Partially Paid</span>
+                                    <?php }
+                                ?>
+                            </td>
+                            <td class="fufil_status">
+                                <?php if ($order['ma_tracking'] != '') { ?>
+                                    <span class="bck-gray">Fulfilled</span>
+                                <?php } else { ?>
+                                    <span class="bck-yellow">Unfulfilled</span>
+                                <?php } ?>
+                            </td>
+                            <td><?php echo $this->escapeHtml($curr.number_format($order['base_grand_total'], 2)); ?></td>
+                            <td>
+                                <a class="PrintLable or_link" href="javascript:void(0);" o_id="<?php echo $this->escapeHtml($oid);?>">Print Label</a>
+                            </td>
+                            <td class="retlink">
+                                <?php if ($order['ma_tracking'] != '' && !isset($order['international'])) { ?>
+                                    <a class="PrintRetLable or_link" href="javascript:void(0);" o_id="<?php echo $this->escapeHtml($oid);?>">Print return label</a>
+                                <?php } ?>
+                            </td>
+                            <td>
+                                <a class="lable_btn or_link" href="javascript:void(0);" o_id="<?php echo $this->escapeHtml($oid);?>">Est.Cost</a>
+                            </td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+            <div class="" align="center" style="display: inline-block;width: 100%;">
+                <ul class="" style="text-align: center;">
+                    <li class="ma_pagination ma_first">
+                        <a class="ma_prev" href="javascript:void(0);" page="0"></a>
+                    </li>
+                    <?php 
+                        for ($i=0; $i < $totalPages; $i++) { 
+                            $style='';
+                            if ($i >=3)
+                                $style="style=display:none;"
+                            ?>
+                                <li class="ma_pagination <?php echo $cls=($i==0)?'ma_active':''; ?>" <?php echo $this->escapeHtml($style); ?>>
+                                    <a href="javascript:void(0);" class="page" page="<?php echo $i+1;?>">
+                                        <?php echo $this->escapeHtml($i+1);?>
+                                    </a>
+                                </li>
+                    <?php
+                        }
+                    ?>
+                    <li class="ma_pagination">
+                        <a class="ma_next" href="javascript:void(0);" page="2"></a>
+                    </li>
+                </ul>
+                <span>( Page <span class="ma_cur-page">1</span> of <span class="total_page">
+                    <?php echo $this->escapeHtml($totalPages);?>
+                </span> )</span>
+            </div>
+        </div>
+    </div>
+    <footer class="ma-footer text-center">
+        <p>A Malca-Amit specialist awaits your call to customize your solutions, contact us anytime.</p>
+        <p>
+            <a href="mailto:Solutions@MyMalca.com" target="_parent">Solutions@MyMalca.com</a> or <b>1-844-MyMalca</b>
+        </p>
+        <a href="/"><img src="<?php echo $this->escapeHtml($this->getViewFileUrl('Malca_Amit/images/logo.png')); ?>"></a>
+        <div>
+            <ul class="f_links"> 
+                <li>
+                    <a href="https://mawordpress.azurewebsites.net/kb/terms-and-conditions-of-service/">
+                        Terms &amp; Condition
+                    </a>
+                </li>
+                <li>
+                    <a href="https://mawordpress.azurewebsites.net/kb/terms-of-use/">
+                        Terms of Use 
+                    </a>
+                </li>
+                <li>
+                    <a href="https://mawordpress.azurewebsites.net/kb/privacy-policy-shipping-service-agreement/">
+                        Privacy Policy
+                    </a>
+                </li>
+                <li>
+                    <a href="https://mawordpress.azurewebsites.net/kb/wordpress-frequently-asked-questions/">FAQ</a>
+                </li>
+                <li><a href="javascript:void(0)" class="ma-logout">Sign out</a></li>          
+            </ul>
+        </div>
+    </footer>
+</div>
+<script type="text/javascript">
+    require(["jquery"],function($) {
+        $(document).ready(function() {
+            $(".ma-logout").click(function(){
+                $(".ma_se-pre-con").show();
+                var customurl = "<?php echo $this->getUrl('amit/login')?>";
+                $.ajax({
+                    url: customurl,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {isLogout:'true'},
+                    success: function(data) { 
+                        if(data.error == false){
+                            window.location.reload();
+                        } else {
+                            $(".ma-alert-error").prepend(data.message).show();
+                            $(".ma_se-pre-con").hide();
+                        }
+                    },
+                    error: function (xhr, status, errorThrown) {
+                        $(".ma-alert-error").prepend('Error happens. Try again.').show();
+                    }
+                })
+            })
+            setTimeout(function(){                
+                $("#datepicker").datepicker({
+                    format: "yyyy-mm-dd",
+                    autoclose: true
+                }).on('change', function(){
+                    $('body').click();
+                });
+            },5000)
+            $("select.ma_sub_filter").change(function(){
+                if($(this).val()==''){
+                    filter_type=''
+                }else{
+                    var filter_type = $(".selFilter").val();
+                }
+                var filter = $(this).val();
+                var date ='';
+
+                if(filter == 'less_than' || filter == 'greater_than'){
+                    $('[name=date]').css('visibility','visible');
+                    return false;
+                }
+                applyFilter(filter,date,filter_type);                
+            })
+            $("#datepicker").change(function(){
+                if($(this).val()==''){
+                    return false;
+                }
+                var filter_type = $(".selFilter").val();
+                var filter = $(".sel_"+filter_type).val();
+                var date =$(this).val();
+
+                applyFilter(filter,date,filter_type);                
+            })
+            $(".refreshBtn").click(function(){
+                $(".ma_se-pre-con").show();
+                var filter_type = $(".selFilter").val();
+                var filter = $("select.ma_sub_filter:visible option:selected").val();
+                if(filter==''){
+                    filter_type='';
+                }
+                var date ='';
+
+                if(filter == 'less_than' || filter == 'greater_than'){
+                    $('[name=date]').css('visibility','visible');
+                    date = $('[name=date]').val();
+                }
+                applyFilter(filter,date,filter_type);
+            })
+            $(document).on("click",".ma_pagination",function(){
+                obj_a = $(this);
+                obj = $(this).find('a');
+                curPage = parseInt(obj.attr('page'));
+                if(curPage == 0){
+                    return false;
+                }
+                
+                $(".ma_se-pre-con").show();
+
+                $(".ma_prev").attr("page",curPage-1);
+                $(".ma_next").attr("page",curPage+1);
+
+                var order = $(".order_by").attr('order');
+                /**Filter**/
+                var filter_type = $(".selFilter").val();
+                var filter = $(".sel_"+filter_type).val();
+                var date ='';
+                if($(".sel_date").val() == 'less_than' || $(".sel_date").val() == 'greater_than'){
+                    date = $('[name=date]').val();
+                }
+                /***/
+                
+                $.ajax({
+                    url:"<?php echo $this->getUrl('amit/orderajax')?>",
+                    type: "POST",
+                    data: {filter_type:filter_type,filter:filter,date:date,page : curPage,order : order,isFilter : 'true'},
+                    dataType: "JSON",
+                    success:function(data){
+                        if(data.error == true){
+                            $('.ma-alert-error').prepend(data.message).show();
+                        } else {
+                            data = JSON.parse(data.message);
+                            $(".ma_cur-page").text(curPage);
+                            $(".page").parent().removeClass('ma_active')
+                            $(".page[page="+curPage+"]").parent().addClass('ma_active');
+                            var total = $(".ma_pagination .page").length;
+
+                            if(curPage != 1 && curPage != total){
+                                obj_a.siblings().not(":first").not(":last").hide();
+                                $(".page[page="+curPage+"]").parent().show();
+                                $(".page[page="+curPage+"]").parent().next().show();
+                                $(".page[page="+curPage+"]").parent().prev().show();
+                            }
+                            if(curPage == total){
+                                $(".ma_next").attr("page","0");
+                            }
+
+                            /*if(Object.keys(data.data).length < 20){
+                                $(".ma_next").attr("page","0");    
+                            }*/
+                            
+                            var html ='';
+                            html = tableHTML(data.data);
+                            if(html){
+                                $(".orderBody").html(html);
+                            }
+                            $(".ma_se-pre-con").hide();
+                        }
+                    },
+                    error:function(){
+                        $(".ma_se-pre-con").hide();
+                    }
+                });
+            })
+            $(".order_by").click(function(){
+                obj = $(this);
+                order = obj.attr('order');
+
+                if(order == 'desc'){
+                    obj.attr('order','asc');
+                }else{
+                    obj.attr('order','desc');
+                }
+
+                $(".ma_se-pre-con").show();
+
+                var filter_type = $(".selFilter").val();
+                var filter = $(".sel_"+filter_type).val();
+                var date ='';
+                if($(".sel_date").val() == 'less_than' || $(".sel_date").val() == 'greater_than'){
+                    date = $('[name=date]').val();
+                }
+
+                $.ajax({
+                    url:"<?php echo $this->getUrl('amit/orderajax')?>",
+                    type: "POST",
+                    data: {page:1,filter_type:filter_type,filter:filter,date:date,order : order,isFilter:'true'},
+                    dataType: "JSON",
+                    success:function(data){
+                        var html ='';
+                        data = JSON.parse(data.message);
+                        html = tableHTML(data.data);
+                        $(".orderBody").html(html);
+                        $(".ma_se-pre-con").hide();
+                    },
+                    error:function(){
+                        $(".ma_se-pre-con").hide();
+                    }
+                });
+            })
+            $(document).on('click',".lable_btn",function(){
+                var obj = $(this);
+                var o_id = obj.attr('o_id');
+                obj.parents('.modal').find('.PrintLable').attr('o_id','');
+                $(".ma_se-pre-con").show();
+                $(".ma_charges").empty();
+                $.ajax({
+                    url:"<?php echo $this->getUrl('amit/orderajax')?>",
+                    type: "POST",
+                    data: {o_id : o_id,getestcost : "true"},
+                    dataType: "JSON",
+                    success:function(data){
+                       	if(data.error == false){
+                       		data = JSON.parse(data.message);
+                       		if(data.flag){
+	                            var charges = data.Charges.MAEX_ChargeDetails;
+	                            var html ='';
+	                            var total = 0;
+	                            $.each(charges,function(i,v){
+	                                html += '<tr>'+
+	                                    '<td>'+v.Description+'</td>'+
+	                                    '<td>$'+parseFloat(v.CustomerCharge).toFixed(2)+'</td>'+
+	                                '</tr>';
+	                                total = total+v.CustomerCharge
+	                            });
+	                            $(".ma_charges").html(html);
+	                            $("#estcost tfoot .total").html('$'+parseFloat(total).toFixed(2));
+	                            $('#estcost').find('.PrintLable').attr('o_id',o_id);
+	                            $(".ma_se-pre-con").hide();
+	                            $("#estcost.ma_popup").show();
+	                        } else {
+	                        	$('.ma-alert-error').prepend(data.error).show();
+	                        	$(".ma_se-pre-con").hide();
+	                        }
+                        }else{
+                        	$('.ma-alert-error').prepend(data.message).show();
+                            $(".ma_se-pre-con").hide();
+                        }               
+                    },
+                    error:function(){
+                        $(".ma_se-pre-con").hide();
+                    }
+                });
+            })
+            $(document).on('click',".PrintLable",function(){
+                var obj = $(this);
+                o_id = Array();
+                if(obj.attr('o_id')){
+                    o_id.push(obj.attr('o_id'));
+                }else{
+                    if($('[name=prntLbl]:checked').length){
+                        $('[name=prntLbl]:checked').each(function(){
+                            o_id.push($(this).val());
+                        })
+                    }else{
+                        $('.ma-alert-error').prepend('Please select one or more order to print label').show();
+                        window.scrollTo(0, 0);
+                        /*setTimeout(function(){
+                            $('.ma-alert-error').hide();
+                        },7000);*/
+                        return false
+                    }
+                }
+                $(".ma_se-pre-con").show();
+                $('.ma-alert-error').hide();
+                $("form[name=downloadLbl]").find("[name=single]").remove();
+                $("form[name=downloadLbl]").find("[name=files]").remove();
+                $("form[name=downloadLbl]").find("[name='files[]']").remove();
+                $.ajax({
+                    url:"<?php echo $this->getUrl('amit/orderajax')?>",
+                    type: "POST",
+                    data: {o_id : o_id,pLable : true},
+                    dataType: "JSON",
+                    success:function(data){
+                        if(data.error == false){
+                            data = JSON.parse(data.message);
+                            $.each(data,function(id,vl){
+                                if(vl.flag){
+                                    if(vl.trackNumber != ''){
+                                        var trklink=''
+                                        if(vl.ma_tracking !=''){
+                                            if(vl.ma_couriertype != null){
+                                                if(vl.ma_couriertype.toLowerCase() == 'fedex'){
+                                                    trklink = "<a target='_blank' href='http://www.fedex.com/Tracking?action=track&tracknumbers="+vl.trackNumber+"'>"+vl.trackNumber+"</a>";
+                                                }else if(vl.ma_couriertype.toLowerCase() == 'ups'){
+                                                    trklink = "<a target='_blank' href='http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums="+vl.trackNumber+"'>"+vl.trackNumber+"</a>";
+                                                }else if(vl.ma_couriertype.toLowerCase() == 'usps'){
+                                                    trklink = "<a target='_blank' href='https://tools.usps.com/go/TrackConfirmAction_input?qtc_tLabels1="+vl.trackNumber+"'>"+vl.trackNumber+"</a>";
+                                                }
+                                            }
+                                        } 
+                                        $("tr[id="+vl.o_id+"]").find('.trackNumber').html(trklink);
+                                        $("tr[id="+vl.o_id+"]").find('.fufil_status').html('<span class="bck-gray">Fulfilled</span>');
+                                        if(! $("tr[id="+vl.o_id+"]").hasClass('ma-intr')){
+                                            $("tr[id="+vl.o_id+"]").find('.retlink').html('<a class="PrintRetLable or_link" href="javascript:void(0);" o_id="'+vl.enId+'">Print return label</a>');
+                                        }
+                                    }
+                                    if(o_id.length==1){
+                                        $("form[name=downloadLbl]").append('<input type="hidden" name="files" value="'+vl.file+'"><input type="hidden" name="single" value="true">');
+                                    }else{
+                                        $("form[name=downloadLbl]").append('<input type="hidden" name="files[]" value="'+vl.file+'">');
+                                    }
+                                    $(".ma_se-pre-con").hide();
+                                }else{
+                                    $(".ma-alert-error:last").after('<div class="ma-alert ma-alert-error">'+vl.o_id+': '+vl.error+'<span>X</span></div>');
+                                    window.scrollTo(0, 0);
+                                    /*setTimeout(function(){
+                                        $(".ma-alert-error").not(":first").remove();
+                                    },7000);*/
+                                    $(".ma_se-pre-con").hide();
+                                }   
+                                $(".close").trigger('click');
+                            })
+                            if($("[name=files]").length || $("[name='files[]']").length){
+                                $("input[name=submitDown]").click();
+                            }
+                        } else {
+                            $('.ma-alert-error').prepend(data.message).show();
+                            $(".ma_se-pre-con").hide();
+                        }   
+                    },
+                    error:function(){
+                        $(".ma_se-pre-con").hide();
+                    }
+                });
+            })
+            $(document).on('click',".PrintRetLable",function(){
+                var obj = $(this);
+                var o_id = obj.attr('o_id');
+                $(".ma_se-pre-con").show();
+
+                $.ajax({
+                    url:"<?php echo $this->getUrl('amit/orderajax')?>",
+                    type: "POST",
+                    data: {o_id : o_id,retLable : "True"},
+                    dataType: "JSON",
+                    success:function(data){
+                        if(data.error == false){
+                            data = JSON.parse(data.message);
+                            if(data.flag){
+                                $("form[name=downloadLbl]").append('<input type="hidden" name="files" value="'+data.filename+'"><input type="hidden" name="single" value="true">');
+                                // $("form[name=downloadLbl]").find("[name=file]").val(data.filename);
+                                $("input[name=submitDown]").click();
+                                $(".ma_se-pre-con").hide();
+                            }else{
+                                $(".ma-alert-error").prepend(data.error).show();
+                                window.scrollTo(0, 0);
+                                /*setTimeout(function(){
+                                    $(".ma-alert-error").hide();
+                                },7000);*/
+                                $(".ma_se-pre-con").hide();
+                            }   
+                            $(".close").trigger('click');
+                        }else {
+                            $('.ma-alert-error').prepend(data.message).show();
+                            $(".ma_se-pre-con").hide();
+                        }  
+                    },
+                    error:function(){
+                        $(".ma_se-pre-con").hide();
+                    }
+                });
+            })
+            $(".close").click(function(){
+                $(this).parents(".ma_popup").hide();  
+            })
+            $('.open-filter').click(function(e){
+                e.stopPropagation();
+            })
+            $('.filter').on("click",function(){
+                $(".open-filter").toggleClass('active');
+            })
+            $(".selFilter").change(function(){
+                $(".ma_sub_filter").val('').hide();            
+                $("#datepicker").css("visibility","hidden")
+                $(".sel_"+$(this).val()).show();
+            })
+            $(".sel_date").change(function(){
+                if($(this).val() == 'less_than' || $(this).val() == 'greater_than'){
+                    $('[name=date]').css('visibility','visible');;
+                }else{
+                    $('[name=date]').css('visibility','hidden');;
+                }
+            })
+            $('[name=checkAll]').change(function(){
+                if($(this).is(":checked")){
+                    $("[name=prntLbl]").prop("checked",true);
+                }else{
+                    $("[name=prntLbl]").prop("checked",false);
+                }
+            });
+            $('[name=prntLbl]').change(function(){
+                if(!$(this).is(":checked")){
+                    $("[name=checkAll]").prop("checked",false);
+                }
+            });
+            $(document).on("click", ".ma-alert span", function(){
+                $(this).parent().hide();
+            })
+        })
+        function formatDate(date) {
+            var monthNames = [
+                "Jan", "Feb", "Mar",
+                "Apr", "May", "Jun", "July",
+                "Aug", "Sep", "Oct",
+                "Nov", "Dec"
+            ];
+
+            var day = date.getDate();
+            var monthIndex = date.getMonth();
+            var year = date.getFullYear();
+            if(day <10){
+                day = '0'+day;
+            }
+
+            return monthNames[monthIndex] + ' ' + day + ' ' + year;
+        }
+        function tableHTML(data){
+            var html ='';
+            $.each(data,function(i,v){
+                var trck='';
+                /*if($("#"+v.entity_id).length){
+                    $(".ma_next").attr("page","0");
+                    html = false;
+                    return false;
+                }*/
+                if(v.ma_tracking != null){
+                    trck = v.ma_tracking;
+                }
+                var cls = (v.international)?'ma-intr':'';
+                html += '<tr id="'+v.increment_id+'" class="'+cls+'">'+
+                    '<td><input type="checkbox" name="prntLbl" value="'+v.entity_id+'"></td>'+
+                    '<td>'+
+                        '<a href="<?php echo $this->escapeHtml($this->getBaseUrl());?>admin/sales_order/view/order_id/'+v.entity_id+'" target="_blank">'+v.increment_id+
+                        '</a>'+
+                    '</td>'+
+                    '<td>'+formatDate(new Date(v.created_at))+'</td>'+
+                    '<td>'+v.customer_firstname+' '+v.customer_lastname+'</td>'+
+                    '<td class="trackNumber">';
+                    if(trck !=''){
+                        var curer ='';
+                        if(v.ma_couriertype != null){
+                            curer = v.ma_couriertype.toLowerCase()
+                        }
+
+                        if(curer == 'fedex'){
+                            html += "<a target='_blank' href='http://www.fedex.com/Tracking?action=track&tracknumbers="+trck+"'>"+trck+"</a>";
+                        }else if(curer == 'ups'){
+                            html += "<a target='_blank' href='http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums="+trck+"'>"+trck+"</a>";
+                        }else if(curer == 'usps'){
+                            html += "<a target='_blank' href='https://tools.usps.com/go/TrackConfirmAction_input?qtc_tLabels1="+trck+"'>"+trck+"</a>";
+                        }else{
+                            html += "<a href='javascript:void(0);'>"+trck+"</a>";
+                        }
+                    } 
+                    html+='</td>'+
+                    '<td>';
+                    paid = parseFloat(v.total_paid);
+                    if(isNaN(paid)){
+                        paid = 0;
+                    }
+                    var amt = parseFloat(v.base_grand_total) - paid;
+                    if(amt == 0){
+                        html += '<span class="bck-gray">Paid</span>';
+                    }else if(amt == parseFloat(v.base_grand_total)){
+                        html += '<span class="bck-orange">Pending</span>';
+                    }else if(amt != 0 && amt < parseFloat(v.base_grand_total)){
+                        html += '<span class="bck-gray">Partially Paid</span>';
+                    }
+                    html += '</td>'+
+                    '<td class="fufil_status">';
+                        if(trck != ''){
+                            html += '<span class="bck-gray">Fulfilled</span>';
+                        } else {
+                            html += '<span class="bck-yellow">Unfulfilled</span>';
+                        }
+                    html += '</td>'+
+                    '<td>'+getCurrencySymbol(v.order_currency_code)+parseFloat(v.base_grand_total).toFixed(2)+'</td>'+
+                    '<td>'+
+                        '<a class="PrintLable or_link" href="javascript:void(0);" o_id='+v.entity_id+' >Print Label</a>'+
+                    '</td>'+
+                    '<td class="retlink">';
+                    if(trck != '' && !v.international){
+                        html += '<a class="PrintRetLable or_link" href="javascript:void(0);" o_id="'+v.entity_id+'">Print return label</a>';
+                    }
+                    html += '</td>'+
+                    '<td>'+
+                        '<a class="lable_btn or_link" href="javascript:void(0);" o_id='+v.entity_id+' >Est.Cost</a>'+
+                    '</td>'+
+                '</tr>';
+            })
+            return html;
+        }
+        function getCurrencySymbol(currency){
+            currency_symbols = {
+                'AED' : '&#1583;.&#1573;', // ?
+                'AFN' : '&#65;&#102;',
+                'ALL' : '&#76;&#101;&#107;',
+                'AMD' : '',
+                'ANG' : '&#402;',
+                'AOA' : '&#75;&#122;', // ?
+                'ARS' : '&#36;',
+                'AUD' : '&#36;',
+                'AWG' : '&#402;',
+                'AZN' : '&#1084;&#1072;&#1085;',
+                'BAM' : '&#75;&#77;',
+                'BBD' : '&#36;',
+                'BDT' : '&#2547;', // ?
+                'BGN' : '&#1083;&#1074;',
+                'BHD' : '.&#1583;.&#1576;', // ?
+                'BIF' : '&#70;&#66;&#117;', // ?
+                'BMD' : '&#36;',
+                'BND' : '&#36;',
+                'BOB' : '&#36;&#98;',
+                'BRL' : '&#82;&#36;',
+                'BSD' : '&#36;',
+                'BTN' : '&#78;&#117;&#46;', // ?
+                'BWP' : '&#80;',
+                'BYR' : '&#112;&#46;',
+                'BZD' : '&#66;&#90;&#36;',
+                'CAD' : '&#36;',
+                'CDF' : '&#70;&#67;',
+                'CHF' : '&#67;&#72;&#70;',
+                'CLF' : '', // ?
+                'CLP' : '&#36;',
+                'CNY' : '&#165;',
+                'COP' : '&#36;',
+                'CRC' : '&#8353;',
+                'CUP' : '&#8396;',
+                'CVE' : '&#36;', // ?
+                'CZK' : '&#75;&#269;',
+                'DJF' : '&#70;&#100;&#106;', // ?
+                'DKK' : '&#107;&#114;',
+                'DOP' : '&#82;&#68;&#36;',
+                'DZD' : '&#1583;&#1580;', // ?
+                'EGP' : '&#163;',
+                'ETB' : '&#66;&#114;',
+                'EUR' : '&#8364;',
+                'FJD' : '&#36;',
+                'FKP' : '&#163;',
+                'GBP' : '&#163;',
+                'GEL' : '&#4314;', // ?
+                'GHS' : '&#162;',
+                'GIP' : '&#163;',
+                'GMD' : '&#68;', // ?
+                'GNF' : '&#70;&#71;', // ?
+                'GTQ' : '&#81;',
+                'GYD' : '&#36;',
+                'HKD' : '&#36;',
+                'HNL' : '&#76;',
+                'HRK' : '&#107;&#110;',
+                'HTG' : '&#71;', // ?
+                'HUF' : '&#70;&#116;',
+                'IDR' : '&#82;&#112;',
+                'ILS' : '&#8362;',
+                'INR' : '&#8377;',
+                'IQD' : '&#1593;.&#1583;', // ?
+                'IRR' : '&#65020;',
+                'ISK' : '&#107;&#114;',
+                'JEP' : '&#163;',
+                'JMD' : '&#74;&#36;',
+                'JOD' : '&#74;&#68;', // ?
+                'JPY' : '&#165;',
+                'KES' : '&#75;&#83;&#104;', // ?
+                'KGS' : '&#1083;&#1074;',
+                'KHR' : '&#6107;',
+                'KMF' : '&#67;&#70;', // ?
+                'KPW' : '&#8361;',
+                'KRW' : '&#8361;',
+                'KWD' : '&#1583;.&#1603;', // ?
+                'KYD' : '&#36;',
+                'KZT' : '&#1083;&#1074;',
+                'LAK' : '&#8365;',
+                'LBP' : '&#163;',
+                'LKR' : '&#8360;',
+                'LRD' : '&#36;',
+                'LSL' : '&#76;', // ?
+                'LTL' : '&#76;&#116;',
+                'LVL' : '&#76;&#115;',
+                'LYD' : '&#1604;.&#1583;', // ?
+                'MAD' : '&#1583;.&#1605;.', //?
+                'MDL' : '&#76;',
+                'MGA' : '&#65;&#114;', // ?
+                'MKD' : '&#1076;&#1077;&#1085;',
+                'MMK' : '&#75;',
+                'MNT' : '&#8366;',
+                'MOP' : '&#77;&#79;&#80;&#36;', // ?
+                'MRO' : '&#85;&#77;', // ?
+                'MUR' : '&#8360;', // ?
+                'MVR' : '.&#1923;', // ?
+                'MWK' : '&#77;&#75;',
+                'MXN' : '&#36;',
+                'MYR' : '&#82;&#77;',
+                'MZN' : '&#77;&#84;',
+                'NAD' : '&#36;',
+                'NGN' : '&#8358;',
+                'NIO' : '&#67;&#36;',
+                'NOK' : '&#107;&#114;',
+                'NPR' : '&#8360;',
+                'NZD' : '&#36;',
+                'OMR' : '&#65020;',
+                'PAB' : '&#66;&#47;&#46;',
+                'PEN' : '&#83;&#47;&#46;',
+                'PGK' : '&#75;', // ?
+                'PHP' : '&#8369;',
+                'PKR' : '&#8360;',
+                'PLN' : '&#122;&#322;',
+                'PYG' : '&#71;&#115;',
+                'QAR' : '&#65020;',
+                'RON' : '&#108;&#101;&#105;',
+                'RSD' : '&#1044;&#1080;&#1085;&#46;',
+                'RUB' : '&#1088;&#1091;&#1073;',
+                'RWF' : '&#1585;.&#1587;',
+                'SAR' : '&#65020;',
+                'SBD' : '&#36;',
+                'SCR' : '&#8360;',
+                'SDG' : '&#163;', // ?
+                'SEK' : '&#107;&#114;',
+                'SGD' : '&#36;',
+                'SHP' : '&#163;',
+                'SLL' : '&#76;&#101;', // ?
+                'SOS' : '&#83;',
+                'SRD' : '&#36;',
+                'STD' : '&#68;&#98;', // ?
+                'SVC' : '&#36;',
+                'SYP' : '&#163;',
+                'SZL' : '&#76;', // ?
+                'THB' : '&#3647;',
+                'TJS' : '&#84;&#74;&#83;', // ? TJS (guess)
+                'TMT' : '&#109;',
+                'TND' : '&#1583;.&#1578;',
+                'TOP' : '&#84;&#36;',
+                'TRY' : '&#8356;', // New Turkey Lira (old symbol used)
+                'TTD' : '&#36;',
+                'TWD' : '&#78;&#84;&#36;',
+                'TZS' : '',
+                'UAH' : '&#8372;',
+                'UGX' : '&#85;&#83;&#104;',
+                'USD' : '&#36;',
+                'UYU' : '&#36;&#85;',
+                'UZS' : '&#1083;&#1074;',
+                'VEF' : '&#66;&#115;',
+                'VND' : '&#8363;',
+                'VUV' : '&#86;&#84;',
+                'WST' : '&#87;&#83;&#36;',
+                'XAF' : '&#70;&#67;&#70;&#65;',
+                'XCD' : '&#36;',
+                'XDR' : '',
+                'XOF' : '',
+                'XPF' : '&#70;',
+                'YER' : '&#65020;',
+                'ZAR' : '&#82;',
+                'ZMK' : '&#90;&#75;', // ?
+                'ZWL' : '&#90;&#36;',
+            }
+            return currency_symbols[currency];
+        }
+        function applyFilter(filter,date,filter_type){
+            $(".ma_se-pre-con").show();
+            
+            order = $(".order_by").attr('order');
+
+            if(order == 'desc'){
+                order = 'asc';
+            }else{
+                order = 'desc';
+            }
+            $.ajax({
+                url:"<?php echo $this->getUrl('amit/orderajax')?>",
+                type: "POST",
+                data: {order:order,page:1,filter : filter, date : date, filter_type : filter_type,isFilter:'true'},
+                dataType: "JSON",
+                success:function(data){
+                    if(data.error == true){
+                        $('.ma-alert-error').prepend(data.message).show();
+                    } else {
+                        data = JSON.parse(data.message);
+                        var html ='';
+                        createPagination(data.page);
+                        html = tableHTML(data.data);
+
+                        $(".orderBody").html(html);
+                        $(".open-filter").removeClass("active");
+                        $(".ma_se-pre-con").hide();
+                        $(".ma_prev").attr("page",'0');
+                        if(Object.keys(data).length < 20){
+                            $(".ma_next").attr("page",'0');
+                        }else{
+                            $(".ma_next").attr("page",'2');
+                        }
+                    }
+                },
+                error:function(){
+                    $(".ma_se-pre-con").hide();
+                }
+            });
+        }
+        function createPagination(page){
+            $(".ma_pagination .page").parent().remove();
+            var html ='';
+            for (var i=0; i < page; i++) { 
+                var style='';
+                if(i >=3)
+                    var style="style=display:none;";
+                var cls = (i==0)?'ma_active':'';
+                html += '<li class="ma_pagination '+cls+'" '+style+' >'+
+                    '<a href="javascript:void(0);" class="page" page="'+(i+1)+'">'+(i+1)+'</a>'+
+                '</li>'
+            }
+            $(".ma_first").after(html);
+            $('.ma_cur-page').text('1')
+            $('.total_page').html(page)
+        }
+    })
+</script>

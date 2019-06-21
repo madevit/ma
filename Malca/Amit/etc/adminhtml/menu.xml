@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../Magento/Backend/etc/menu.xsd">
+    <menu>
+        <add id="Malca_Amit::parent" title="Malca Amit" module="Malca_Amit" sortOrder="10" resource="Malca_Amit::parent"/>
+        <add id="Malca_Amit::index" title="Login" module="Malca_Amit" sortOrder="11" action="amit/index" resource="Malca_Amit::index" parent="Malca_Amit::parent"/>
+        <add id="Malca_Amit::order" title="Orders" module="Malca_Amit" sortOrder="10" action="amit/order" resource="Malca_Amit::index" parent="Malca_Amit::parent"/>
+		
+    </menu>
+</config>

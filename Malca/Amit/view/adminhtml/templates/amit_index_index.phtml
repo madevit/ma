@@ -1,0 +1,253 @@
+<script src='https://www.google.com/recaptcha/api.js'></script>
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600" rel="stylesheet">
+<?php //$outputMessage = Mage::getSingleton('core/session')->getRegMessage();
+    //if ($outputMessage != '') {
+        //Mage::getSingleton('core/session')->unsRegMessage();?>
+        <div class="ma_popup">
+            <div class="popup_content">
+                <div class="ma_header">
+                    <h3></h3>
+                    <a href="javascript:void(0);" class="close">X</a>
+                </div>
+                <div class="ma_content">
+                    <h2>Thank You for your registration!</h2>
+                    <p>Our team shall contact you shortly with account activation details.</p>
+                </div>
+                <!-- <div class="ma_footer">
+                    <button type="submit">Print Label</button>
+                    <button type="submit" class="cancel">Cancel</button>
+                </div> -->
+            </div>
+        </div>
+<?php 
+    //}
+
+    /*$act = $this->getUrl("amit/adminhtml_amitbackend/login");
+    $regAct = $this->getUrl("admin_amit/adminhtml_amitbackend/registration");*/
+    $key = $this->getFormKey();
+    $logo = $this->getViewFileUrl('Malca_Amit/images/logo.png');
+?>
+<div class="ma_se-pre-con" style="display: none;">
+    <img src="<?php echo $this->escapeHtml($this->getViewFileUrl('Malca_Amit/images/ma_loader.gif')); ?>">
+</div>
+<div class="ma-alert ma-alert-error" style="display: none;"></div>
+<div class="ma-alert ma-alert-success" style="display: none;"></div>
+<div class="ma_body">
+    <header>
+        <div class="left">
+            <img src="<?php echo $this->escapeHtml($this->getViewFileUrl('Malca_Amit/images/App_Logo.jpg')); ?>">
+        </div>
+        <div class="right">
+            <img src="<?php echo $this->escapeHtml($this->getViewFileUrl('Malca_Amit/images/logo.png')); ?>">
+        </div>
+    </header>
+
+    <div class="ma_forms">
+        <div class="col-36 detail">
+            <div class="border-div">
+                <ul>
+                    <li>Easily Create Shipping Labels For <b>FedEx, UPS </b> and <b>USPS</b>.</li>
+                    <li>Get <b> Less</b> Than Market Price on Each Transactions.</li>
+                    <li>Insured Every Transaction <b>Up To $100,000.</b></li>
+                    <li>Track Your Shipment And be Notified upon Delivery.</li>
+                    <li><b>All Calls Are Personally Answered.</b></li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-32 login">
+            <div class="border-div">
+                <h3>Login</h3>
+                <img src="<?php echo $this->escapeHtml($logo); ?>" class="ma_loginLogo">
+                <form name="login" method="post" id="login1" accept-charset="utf-8">
+                    <input name="form_key" type="hidden" value="<?php echo $this->escapeHtml($key); ?>" />
+                    <ul>
+                        <li class="user_nm">
+                            <input type="text" name="username" placeholder="User Name" required="required">
+                        </li>
+                        <li class="pwd">
+                            <input type="password" name="password" placeholder="Password" required="required">
+                        </li>
+                        <li class="stn-code">
+                            <input type="text" name="stationcode" placeholder="Station Code" required="required">
+                        </li>
+                        <li>
+                            <div class="g-recaptcha" data-sitekey="6LfjS2UUAAAAAO_C0OmMjQGIUffkcPkVQAaYcX5k"></div>
+                        </li>
+                        <li>
+                            <button type="button" class="ma-login">Login</button>
+                        </li>
+                    </ul>
+                </form>                
+                <div class="divider">
+                    <span>or</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-32 sign-up">
+            <div class="border-div">
+                <h3>Sign Up</h3>
+                <form name="register" method="post" id="register" autocomplete="on"> 
+                    <input name="form_key" type="hidden" value="<?php echo $this->escapeHtml($key); ?>" />
+                    <ul>
+                        <li class="cnm">
+                            <input name="companyname" required="required" type="text" placeholder="Company Name">
+                        </li>
+                        <li class="cweb">
+                            <input name="companywebsite" type="text" placeholder="Company Website">
+                        </li>
+                        <li class="con_per">
+                            <input name="contactperson" required="required" type="text" placeholder="Contact Person"> 
+                        </li>
+                        <li class="phone">
+                            <input name="phone" required="required" type="text" placeholder="Phone">
+                        </li>
+                        <li class="email">
+                            <input name="emailsignup" required="required" type="email" placeholder="Email">
+                        </li>
+                        <li> 
+                            <div class="g-recaptcha" data-sitekey="6LfjS2UUAAAAAO_C0OmMjQGIUffkcPkVQAaYcX5k"></div>
+                        </li>
+                        <li>
+                            <button type="button" class="ma-signup">Sign up</button>
+                        </li>
+                    </ul>
+                </form>
+            </div>
+        </div>
+    </div>
+    <footer class="ma-footer text-center">
+        <p>A Malca-Amit specialist awaits your call to customize your solutions, contact us anytime.</p>
+        <p><a href="mailto:Solutions@MyMalca.com" target="_parent">Solutions@MyMalca.com</a> or 1-844-MyMalca</b></p>
+        <a href="/"><img src="<?php echo  $this->escapeHtml($logo); ?>"></a>
+        <div>
+            <ul class="f_links"> 
+                <li>
+                    <a href="https://mawordpress.azurewebsites.net/kb/terms-and-conditions-of-service/">
+                        Terms &amp; Condition
+                    </a>
+                </li>
+                <li><a href="https://mawordpress.azurewebsites.net/kb/terms-of-use/">Terms of Use </a></li>
+                <li>
+                    <a href="https://mawordpress.azurewebsites.net/kb/privacy-policy-shipping-service-agreement/">
+                        Privacy Policy
+                    </a>
+                </li>
+                <li>
+                    <a href="https://mawordpress.azurewebsites.net/kb/wordpress-frequently-asked-questions/">FAQ</a>
+                </li>
+            </ul>
+        </div>
+    </footer>
+</div>
+<script type="text/javascript">
+    require(["jquery"],function($) {
+        $(document).ready(function() {
+            $(".ma_popup .close").click(function(){
+                $(".ma_popup").hide();  
+            })
+            $(".ma-login").click(function(){
+                var error = false;
+                $("#login1").find("[required=required]").each(function(){
+                    if($(this).val() == ''){
+                        $(this).css('border-color', 'red');
+                        error = true;
+                    } else {
+                        $(this).css('border-color', '#cacaca');
+                    }
+                })
+                if(error){
+                    return false;
+                }
+
+                $(".ma_se-pre-con").show();
+                var params = $("#login1").serializeArray();
+                var formData = new FormData();
+                $(params).each(function (index, element) {
+                    formData.append(element.name, element.value);
+                });
+                formData.append("isLogin", 'true');
+                /*"<?php echo $this->getUrl()."/".$this->helper('Magento\Backend\Helper\Data')->getAreaFrontName().'/amit/login'?>"*/
+                var customurl = "<?php echo $this->getUrl('amit/login') ?>";
+                $.ajax({
+                    url: customurl,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function(data) { 
+                        if(data.error == false){
+                            window.location.reload();
+                        } else {
+                            $(".ma-alert-error").text(data.message).show();
+                            $(".ma_se-pre-con").hide();
+                        }
+                    },
+                    error: function (xhr, status, errorThrown) {
+                        $(".ma-alert-error").text('Error happens. Try again.').show();
+                        $(".ma_se-pre-con").hide();
+                    }
+                });
+            });
+            $(".ma-signup").click(function(){
+                var error = false;
+                $("#register").find("[required=required]").each(function(){
+                    if($(this).val() == ''){
+                        $(this).css('border-color', 'red');
+                        error = true;
+                    } else {
+                        $(this).css('border-color', '#cacaca');
+                    }
+                })
+                if(error){
+                    return false;
+                }
+                if(!validateEmail($("[name=emailsignup]").val())){
+                    $("[name=emailsignup]").css('border-color', 'red');
+                    return false;
+                }
+                $(".ma_se-pre-con").show();
+                var params = $("#register").serializeArray();
+                var formData = new FormData();
+                $(params).each(function (index, element) {
+                    formData.append(element.name, element.value);
+                });
+                formData.append("isSignup", 'true');
+                var customurl = "<?php echo $this->getUrl('amit/login')?>";
+                $.ajax({
+                    url: customurl,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function(data) { 
+                        if(data.error == false){
+                            $(".ma_popup").show();
+                            jQuery("#register")[0].reset()
+                        } else {
+                            $(".ma-alert-error").text(data.message).show();
+                        }
+                        $(".ma_se-pre-con").hide();
+
+                    },
+                    error: function (xhr, status, errorThrown) {
+                        $(".ma-alert-error").text('Error happens. Try again.').show();
+                        $(".ma_se-pre-con").hide();
+                    }
+                });
+            });
+        });
+        function validateEmail(email){
+            var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+            if (reg.test(email) == false) 
+            {
+                return false;
+            }
+            return true;
+        }
+    });
+
+</script>

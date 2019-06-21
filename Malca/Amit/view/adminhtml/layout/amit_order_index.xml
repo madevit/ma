@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
+	<head>
+        <title>Orders</title>
+         
+		<css src="Malca_Amit::css/datepicker.min.css"/>
+		<css src="Malca_Amit::css/ma-style.css"/>
+		<script src="Malca_Amit::js/datepicker.min.js"/>
+		<!--<css src="jquery/fileUploader/css/jquery.fileupload-ui.css"/>
+		<script src="path/file.js" defer="defer"/>
+		<link src="http://url.com" src_type="url"/>
+		<remove src="path/remove/file.css"/> -->		
+    </head> 
+	<body>
+        <referenceContainer name="content">
+            <!-- <uiComponent name="sales_order_grid"/> -->
+            <block class="Malca\Amit\Block\Adminhtml\Order\Index" name="amit_block_adminhtml_order_index"  template="Malca_Amit::amit_order_index.phtml" />
+        </referenceContainer>
+    </body>
+</page>
