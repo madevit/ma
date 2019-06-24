@@ -71,65 +71,47 @@ class Index extends \Magento\Backend\App\Action
                 $msg = $e->getMessage();
                 $error = true;
             }
-        } elseif (isset($postParams['isSignup'])) {
-            if (isset($postParams['g-recaptcha-response'])) {
-                $captcha=$postParams['g-recaptcha-response'];
-            }
+        } elseif (isset($postParams['isSignup'])) {           
+            if (!empty($postParams)) {
+                $baseUrl = $this->getUrl();
+                $params = [
+                    "StoreDetails"=>[
+                        "PlatformType"=>'Magento',
+                        "StoreId"=>$baseUrl,
+                        "StoreName"=>'',
+                        "StoreDomain"=>$baseUrl,
+                        "StationCode"=>'',
+                        "Token"=>$baseUrl,
+                        "AppStatus"=>'installed',
+                        "AppStatusChangeDate"=>$this->date->gmtDate('Y-m-d'),
+                        "AppStatusCreatedDate"=>$this->date->gmtDate('Y-m-d'),
+                        "UserCode"=>'',
+                        "CompanyName"=>$postParams['companyname'],
+                        "CompanyWebsite"=>$postParams['companywebsite'],
+                        "ContactPerson"=>$postParams['contactperson'],
+                        "CustomerPhone"=>$postParams['phone'],
+                        "CustomerEmail"=>$postParams['emailsignup'],
+                    ],
+                    "ApplicationId"=>969
+                ];
+                try {
+                    $wsdl = "https://my.malca-amit.us/mymabookingwebservice/malcaamitservices.asmx?wsdl";
+                    $client = new \SoapClient($wsdl);
+                    $client->__setLocation('https://my.malca-amit.us/MyMABookingWebService/MalcaAmitServices.asmx');
 
-            if (!$captcha) {
-                $msg = 'Please check the captcha form';
-                $error = true;
-            } else {
-                $url="https://www.google.com/recaptcha/api/siteverify?";
-                $url.="secret=6LfjS2UUAAAAANdyVu-WWbh-YuJNXoYnEvxxBNBt&response=".$captcha;
-                //@codingStandardsIgnoreStart
-                $response=json_decode(file_get_contents($url), true);
-                //@codingStandardsIgnoreEnd
-                if ($response['success'] == false) {
-                    $msg = 'You are spammer !';
+                    $actionHeader = new \SoapHeader('http://tempuri.org/', 'setMAEXEcommerceStoreDetails', true);
+                    $client->__setSoapHeaders($actionHeader);
+
+                    $result = $client->__soapCall('setMAEXEcommerceStoreDetails', [$params]);
+                    
+                    $msg = 'Success';
+                    $error = false;
+                } catch (\Exception $e) {
+                    $msg = $e->getMessage();
                     $error = true;
-                } else {
-                    if (!empty($postParams)) {
-                        $baseUrl = $this->getUrl();
-                        $params = [
-                            "StoreDetails"=>[
-                                "PlatformType"=>'Magento',
-                                "StoreId"=>$baseUrl,
-                                "StoreName"=>'',
-                                "StoreDomain"=>$baseUrl,
-                                "StationCode"=>'',
-                                "Token"=>$baseUrl,
-                                "AppStatus"=>'installed',
-                                "AppStatusChangeDate"=>$this->date->gmtDate('Y-m-d'),
-                                "AppStatusCreatedDate"=>$this->date->gmtDate('Y-m-d'),
-                                "UserCode"=>'',
-                                "CompanyName"=>$postParams['companyname'],
-                                "CompanyWebsite"=>$postParams['companywebsite'],
-                                "ContactPerson"=>$postParams['contactperson'],
-                                "CustomerPhone"=>$postParams['phone'],
-                                "CustomerEmail"=>$postParams['emailsignup'],
-                            ],
-                            "ApplicationId"=>969
-                        ];
-                        try {
-                            $wsdl = "https://my.malca-amit.us/mymabookingwebservice/malcaamitservices.asmx?wsdl";
-                            $client = new \SoapClient($wsdl);
-                            $client->__setLocation('https://my.malca-amit.us/MyMABookingWebService/MalcaAmitServices.asmx');
-
-                            $actionHeader = new \SoapHeader('http://tempuri.org/', 'setMAEXEcommerceStoreDetails', true);
-                            $client->__setSoapHeaders($actionHeader);
-
-                            $result = $client->__soapCall('setMAEXEcommerceStoreDetails', [$params]);
-                            
-                            $msg = 'Success';
-                            $error = false;
-                        } catch (\Exception $e) {
-                            $msg = $e->getMessage();
-                            $error = true;
-                        }
-                    }
                 }
             }
+            
         } elseif (isset($postParams['isLogout'])) {
             $this->configWriter->save('malca/amit/username', '', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, 0);
             $this->configWriter->save('malca/amit/password', '', ScopeConfigInterface::SCOPE_TYPE_DEFAULT, 0);
